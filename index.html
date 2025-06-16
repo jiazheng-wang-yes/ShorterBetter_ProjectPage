@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="utf-8">
+  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
+  <!-- Replace the content tag with appropriate information -->
+  <meta name="description" content="ShorterBetter: Guiding Reasoning Models to Find Optimal Inference Length for Efficient Reasoning">
+  <meta property="og:title" content="ShorterBetter"/>
+  <meta property="og:description" content="A simple yet effective reinforcement learning method that enables reasoning models to learn their own optimal CoT lengths without manual supervision."/>
+  <meta property="og:url" content="https://shorterbetter.github.io"/>
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
+  <meta property="og:image" content="static/images/paper-figures/sb-flow-3.png" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+
+  <meta name="twitter:title" content="ShorterBetter: Efficient Reasoning in LLMs">
+  <meta name="twitter:description" content="A reinforcement learning method that enables reasoning models to learn optimal CoT lengths without manual supervision.">
+  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
+  <meta name="twitter:image" content="static/images/paper-figures/sb-flow-3.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Keywords for your paper to be indexed by-->
+  <meta name="keywords" content="LLM, reasoning, reinforcement learning, chain of thought, efficient reasoning, overthinking, optimal reasoning length">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <title>ShorterBetter: Efficient Reasoning in LLMs</title>
+  <link rel="icon" type="image/x-icon" href="static/images/logo.png">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+  rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="static/css/performance-chart.css">
+  <link rel="stylesheet" href="static/css/category.css">
+  
+  
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+  <script src="static/js/performance-chart.js"></script>
+  <script src="static/js/category.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.30.1.min.js"></script>
+  <script src="static/js/experiment-results.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      options: {
+        renderActions: {
+          addMenu: []
+        }
+      }
+    };
+  </script>
+</head>
+<body>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">ShorterBetter: Guiding Reasoning Models to Find Optimal Inference Length for Efficient Reasoning</h1>
+            <div class="is-size-5 publication-authors">
+              <!-- Paper authors -->
+              <span class="author-block">
+                <a href="#" target="_blank">Jingyang Yi</a>,</span>
+                <span class="author-block">
+                  <a href="#" target="_blank">Jiazheng Wang</a>,</span>
+                  <span class="author-block">
+                    <a href="#" target="_blank">Sida Li</a>
+                  </span>
+                  </div>
+
+                  <div class="is-size-5 publication-authors">
+                    <span class="author-block">Data Science Institute, The University of Chicago<br>Preprint <i>(In Submission)</i></span>
+                  </div>
+
+                  <div class="column has-text-centered">
+                    <div class="publication-links">
+                         <!-- PDF link -->
+                      <span class="link-block">
+                        <a href="https://arxiv.org/abs/2504.21370" target="_blank"
+                        class="external-link button is-normal is-rounded is-dark">
+                        <span class="icon">
+                          <i class="fas fa-file-pdf"></i>
+                        </span>
+                        <span>arXiv:2504.21370</span>
+                      </a>
+                    </span>
+
+                  <!-- Github link -->
+                  <span class="link-block">
+                    <a href="https://github.com/JingyangYi/ShorterBetter" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Source Code</span>
+                  </a>
+                </span>
+
+                <!-- Hugging Face model link -->
+                <span class="link-block">
+                  <a href="https://huggingface.co/Justin6657/SB_DS1.5B_alpha_2" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    🤗
+                  </span>
+                  <span>Model (1.5B)</span>
+                </a>
+              </span>
+
+              <!-- Hugging Face 7B model link -->
+              <span class="link-block">
+                <a href="https://huggingface.co/JingyangYi/SB_DS7B_alpha_2/" target="_blank"
+                class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">
+                  🤗
+                </span>
+                <span>Model (7B)</span>
+              </a>
+            </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Teaser video-->
+<!-- <section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body"> -->
+      <!-- <img src="static/images/paper-figures/sb-flow-3.png" alt="ShorterBetter Framework" width="100%">
+       -->
+      <!-- <div class="flowchart-container">
+        <img src="static/images/flowchart.svg" alt="ShorterBetter Framework" class="flowchart-image" width="150%">
+      </div>
+      
+      <h2 class="subtitle has-text-centered" style="margin-top: 2rem;">
+        ShorterBetter is a reinforcement learning method that enables reasoning models to learn their own optimal Chain-of-Thought lengths without manual supervision, achieving 50%-80% reduction in output lengths while maintaining accuracy.
+      </h2>
+    </div>
+  </div>
+</section> -->
+<!-- End teaser video -->
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p class="is-size-5">
+            Recent models such as OpenAI o1 and DeepSeek-R1 have demonstrated strong performance on reasoning-intensive tasks by generating extended Chain-of-Thought (CoT) traces. While longer reasoning helps with thorough exploration of solution paths for complex problems, it also often leads to inefficient and redundant outputs—a phenomenon commonly described as <i>overthinking</i>. In this paper, we propose <b>ShorterBetter</b>, a simple yet effective reinforcement learning method that enables reasoning models to learn their own optimal CoT lengths without manual supervision. We define the <i>Sample Optimal Length</i> (SOL) as the length of the shortest correct response among multiple generations, which serves as a dynamic reward signal to guide the model toward efficient reasoning. Applied to <code>DeepSeek-Distill-Qwen-1.5B/7B</code> as base models, ShorterBetter achieves <b>50%-80% reduction</b> in output lengths in both in-domain and out-of-domain reasoning tasks while maintaining accuracy. Our reasoning trace analysis shows that ShorterBetter refines the structure of the reasoning traces by reducing unnecessary repetition, excessive self-verification, and over-exploration of alternatives.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+
+<!-- Image carousel -->
+<!-- <section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+       <div class="item">
+        <img src="static/images/paper-figures/1.5B_model_performance_math_ood.pdf" alt="Model Performance" width="100%"/>
+        <h2 class="subtitle has-text-centered">
+          ShorterBetter exhibits strong length reduction performance (1.5B models) while maintaining accuracy.
+        </h2>
+      </div>
+      <div class="item">
+        <img src="static/images/paper-figures/shorter-better-flowchart.pdf" alt="ShorterBetter Flowchart" width="100%"/>
+        <h2 class="subtitle has-text-centered">
+          Flowchart for the ShorterBetter pipeline.
+        </h2>
+      </div>
+      <div class="item">
+        <img src="static/images/paper-figures/first_appearance.pdf" alt="First Appearance Analysis" width="100%"/>
+        <h2 class="subtitle has-text-centered">
+         Analysis of output after first appearance of correct answer.
+       </h2>
+     </div>
+     <div class="item">
+      <img src="static/images/paper-figures/SOL_deviation.pdf" alt="SOL Deviation" width="100%"/>
+      <h2 class="subtitle has-text-centered">
+        SOL trends and mean deviations during training.
+      </h2>
+    </div>
+  </div>
+</div>
+</div>
+</section> -->
+<!-- End image carousel -->
+
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+<!-- Examples of Inefficient Reasoning Section -->
+<div style="margin-top: 4rem;">
+  <h3 class="title is-3" style="color: #2c3e50; margin-bottom: 2rem;">Examples of Verbose Repetition and Self-Verification in Intermediate Steps</h3>
+  <div class="content is-size-5" style="margin-bottom: 2rem;">
+    The following examples demonstrate common patterns of inefficient reasoning where models engage in excessive repetition, circular logic, and unnecessary self-verification that leads to verbose responses without improving accuracy.
+  </div>
+  
+  <!-- Example 1: Math Problem -->
+  <div class="example-container" style="margin-bottom: 2rem;">
+    <div class="example-header" onclick="toggleExample('example1')" style="cursor: pointer; background: #3498db; color: white; padding: 1rem; border-radius: 8px 8px 0 0; font-weight: 600; display: flex; justify-content: between; align-items: center;">
+      <span class="is-size-5">Example 1: Verbose Repetition Without New Insights</span>
+      <span id="example1-toggle" style="font-size: 1.2em;">▼</span>
+    </div>
+    <div id="example1" class="example-content" style="background: white; border: 2px solid #3498db; border-top: none; border-radius: 0 0 8px 8px; padding: 1.5rem; display: none;">
+      <div style="background: #f8f9fa; color: #2c3e50; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <strong class="is-size-5">Prompt:</strong><br>
+        <span class="is-size-5">Denali and Nate work for a dog walking business and are paid for each dog they walk. Denali is responsible for 16 dogs and Nate is responsible for 12 dogs. Under the company's new policy, they will be assigned or unassigned new dogs in groups of x dogs. The ratio of Denali's pay to Nate's pay would be the same if Denali started walking 4x more dogs and Nate stayed at 12 dogs or if x of Nate's dogs were reassigned to Denali. Find x if x ≠ 0.</span>
+      </div>
+      
+      <div style="background: #f8f9fa; color: #2c3e50; padding: 1rem; border-radius: 4px;">
+        <strong class="is-size-5">Response (DeepSeek-R1-Distill-Qwen-1.5B):</strong><br><br>
+        <div style="font-family: 'Courier New', monospace; line-height: 1.4;" class="is-size-5">
+          ...<br>
+          <span style="color: #e74c3c;">Wait</span>, perhaps the problem is not about the same pay ratio, but the same total number of dogs? But the problem says "the ratio of Denali's pay to Nate's pay would be the same." So it's about the pay ratio, not the number of dogs.<br><br>
+          <span style="color: #e74c3c;">Wait</span>, another thought: Maybe the ratio is in terms of the number of dogs walked, so if the ratio of their pay is same, and pay is per dog, then perhaps the number of dogs walked should be proportional.<br>
+          <span style="color: #e74c3c;">Wait</span>, that is, if Denali walks 16 dogs and Nate walks 12, the ratio of their pay is (16)/(12) if they are paid per dog.<br><br>
+          ...<br>
+          <span style="color: #e74c3c;">Wait</span>, so regardless of how I set up the ratio, I end up with x=0.<br>
+          <span style="color: #e74c3c;">But</span> since the problem states x≠0, perhaps my entire approach is wrong.<br>
+          <span style="color: #e74c3c;">Wait</span>, let me think differently.<br>
+          <span style="color: #e74c3c;">Perhaps</span> the ratio of their pay is the same when they are assigned x dogs, regardless of direction.<br>
+          <span style="color: #e74c3c;">Wait</span>, when they are assigned x dogs in groups of x, meaning x dogs are reassigned. So the ratio is same.<br>
+          <span style="color: #e74c3c;">Perhaps</span> it's the pay per dog ratio that's the same.<br>
+          <span style="color: #e74c3c;">Wait</span>, maybe Denali's pay per dog is same as Nate's.<br>
+          <span style="color: #e74c3c;">But</span> that would be same as each getting paid per dog.<br>
+          <span style="color: #e74c3c;">Wait</span>, but if they are reassigned, their pay per dog would be same.<br>
+          <span style="color: #e74c3c;">Wait</span>, perhaps we can think in terms of average.<br>
+          <span style="color: #e74c3c;">Wait</span>, I'm getting confused. Maybe I should go back to the original problem.<br>
+          <span style="color: #e74c3c;">But</span> we saw that this leads to x=0.<br>
+          <span style="color: #e74c3c;">Alternatively</span>, maybe the ratio is the other way around.<br>
+          <span style="color: #e74c3c;">Wait</span>, perhaps the ratio is the pay per dog ratio. So if the pay per dog is same, then the ratio is 1:1.<br>
+          <span style="color: #e74c3c;">But</span> in that case, both would have to walk same number of dogs. <span style="color: #e74c3c;">But</span> the problem says that if x dogs are reassigned, it results in same ratio.<br>
+          <span style="color: #e74c3c;">But</span> in that case, if the pay per dog is same, then it's just the same number of dogs walked, which would imply that 16 − x = 16 + 4x ⇒ −5x = 0 ⇒ x = 0, which is again invalid.<br>
+          <span style="color: #e74c3c;">Wait</span>, perhaps I need to approach this problem by assuming that the pay ratio remains the same.<br>
+          ...
+        </div>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 1rem; border-left: 4px solid #e74c3c;">
+        <strong class="is-size-5">Issues Identified:</strong>
+        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;" class="is-size-5">
+          <li><strong>Excessive "Wait" repetitions:</strong> The model uses "Wait" 15+ times, indicating circular reasoning</li>
+          <li><strong>Self-contradiction:</strong> Repeatedly arrives at x=0 but continues searching without systematic approach</li>
+          <li><strong>Lack of progress:</strong> Multiple paragraphs of reasoning without advancing toward the solution</li>
+          <li><strong>Verbose self-verification:</strong> Constantly second-guessing previous steps instead of building upon them</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 2: Math Problem -->
+  <div class="example-container" style="margin-bottom: 2rem;">
+    <div class="example-header" onclick="toggleExample('example2')" style="cursor: pointer; background: #3218db; color: white; padding: 1rem; border-radius: 8px 8px 0 0; font-weight: 600; display: flex; justify-content: between; align-items: center;">
+      <span class="is-size-5">Example 2: Early Stopping of Promising Paths</span>
+      <span id="example2-toggle" style="font-size: 1.2em;">▼</span>
+    </div>
+    <div id="example2" class="example-content" style="background: white; border: 2px solid #3498db; border-top: none; border-radius: 0 0 8px 8px; padding: 1.5rem; display: none;">
+      <div style="background: #f8f9fa; color: #2c3e50; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <strong class="is-size-5">Prompt:</strong><br>
+        <span class="is-size-5">The function \(f\) satisfies the functional equation
+          $$f(x) + f(y) = f(x + y) - xy - 1$$ 
+          for all real numbers \(x\) and \(y\)  If \(f(1) = 1\), then find all integers \(n\) such that \(f(n) = n\).  Enter all such integers, separated by commas.</span>
+      </div>
+      
+      <div style="background: #f8f9fa; color: #2c3e50; padding: 1rem; border-radius: 4px;">
+        <strong class="is-size-5">Response (DeepSeek-R1-Distill-Qwen-1.5B):</strong><br><br>
+        <div style="font-family: 'Courier New', monospace; line-height: 1.4;" class="is-size-5">
+          Now, let's find f(2):<br>
+          Using the recursive formula, set x = 1:<br>
+          f(2) = f(1) + 1 + 2 = 1 + 1 + 2 = 4<br>
+          Wait, is that right? Let me check<br>
+          <span style="color: #e74c3c;">Wait, actually, according to the recursive formula f(x + 1) = f(x) + x + 2, so for x = 1: ...</span>
+          ...<br>
+        </div>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 1rem; border-left: 4px solid #e74c3c;">
+        <strong class="is-size-5">Issues Identified:</strong>
+        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;" class="is-size-5">
+          <li>We observe that the model starts to check for \(x = 1\) immediately after it decides to check \(f(2)\), interrupting its own verification step.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 3: Math Problem -->
+  <div class="example-container" style="margin-bottom: 2rem;">
+    <div class="example-header" onclick="toggleExample('example3')" style="cursor: pointer; background: #db182c; color: white; padding: 1rem; border-radius: 8px 8px 0 0; font-weight: 600; display: flex; justify-content: between; align-items: center;">
+      <span class="is-size-5">Example 3: Over-Exploration and Extraneous Solution Checks</span>
+      <span id="example3-toggle" style="font-size: 1.2em;">▼</span>
+    </div>
+    <div id="example3" class="example-content" style="background: white; border: 2px solid #db182c; border-top: none; border-radius: 0 0 8px 8px; padding: 1.5rem; display: none;">
+      <div style="background: #f8f9fa; color: #2c3e50; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <strong class="is-size-5">Prompt:</strong><br>
+        <span class="is-size-5">Find all values of x that satisfy the equation \( x = \sqrt{11 - 2x} + 4 \).</span>
+      </div>
+      
+      <div style="background: #f8f9fa; color: #2c3e50; padding: 1rem; border-radius: 4px;">
+        <strong class="is-size-5">Response (DeepSeek-R1-Distill-Qwen-1.5B):</strong><br><br>
+        <div style="font-family: 'Courier New', monospace; line-height: 1.4;" class="is-size-5">
+So, the solutions are x = 1 and x = 5. But wait, I need to check if these solutions actually satisfy the original equation because sometimes squaring both sides can introduce extraneous solutions.<br>
+First, let me check x = 1:<br>
+Left side: 1 = \sqrt{11 - 2(1)} + 4<br>
+Calculate inside the square root: 11 - 2 * 1 = 9. So, square root of 9 is 3. Then 3 + 4 = 7. But left side is 1, 1 ≠ 7. That means x = 1 is not a valid solution.<br>
+Now, check x = 5:<br>
+Left side: 5 = \sqrt{11 - 2(5)} + 4<br>
+Calculate inside the square root: 11 - 10 = 1. Square root of 1 is 1. Then 1 + 4 = 5. So, 5 = 5, which is true. Therefore, x = 5 is a valid solution.<br>
+But wait, earlier I thought that x must be greater than or equal to 4. Since x = 5 is greater than 4, that's fine. But x = 1 is less than 4.<br>
+Wait, hold on. Let me double-check my earlier factorization and solution.<br>
+I had x² - 6x + 5 = 0, which factored into (x - 1)(x - 5) = 0, giving x = 1 and x = 5.<br>
+Plugging x = 5 into the original equation worked, but plugging x = 1 didn't. So, x = 1 is extraneous.<br>
+But is there any other step I should verify? Sometimes, especially with square roots, squaring both sides can sometimes lead to other issues, but in this case, since we didn't square the square root term on both sides but isolated it once, it seems fine.<br>
+Let me consider another method to solve the equation, ...<br><br>
+Same quadratic as before, so same solutions. So, same process, same result. So, x = 1 and x = 5, but only x = 5 is valid.<br>
+But just to make sure, let me consider if squaring the equation introduced any extraneous solutions. Sometimes when we square both sides, it's easy to have extra roots.<br>
+        </div>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 1rem; border-left: 4px solid #e74c3c;">
+        <strong class="is-size-5">Issues Identified:</strong>
+        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;" class="is-size-5">
+          <li><strong>Over-exploration and repeated verification:</strong> The model repeatedly checks for extraneous solutions and re-derives the same result multiple times.</li>
+          <li><strong>Verbose self-doubt:</strong> Multiple "wait" and "let me check" statements, even after the correct answer is found.</li>
+          <li><strong>Redundant solution paths:</strong> Attempts to solve the same quadratic again after already confirming the answer.</li>
+          <li><strong>Unnecessary caution:</strong> Excessive concern about extraneous solutions, leading to longer output without new insights.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 4: Collapse of Reasoning Coherence -->
+  <div class="example-container" style="margin-bottom: 2rem;">
+    <div class="example-header" onclick="toggleExample('example4')" style="cursor: pointer; background: #111111; color: white; padding: 1rem; border-radius: 8px 8px 0 0; font-weight: 600; display: flex; justify-content: between; align-items: center;">
+      <span class="is-size-5">Example 4: Collapse of Reasoning Coherence Following Very Long Outputs</span>
+      <span id="example4-toggle" style="font-size: 1.2em;">▼</span>
+    </div>
+    <div id="example4" class="example-content" style="background: white; border: 2px solid #111111; border-top: none; border-radius: 0 0 8px 8px; padding: 1.5rem; display: none;">
+      <div style="background: #f8f9fa; color: #2c3e50; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <strong class="is-size-5">Response (DeepSeek-R1-Distill-Qwen-1.5B; budget = 16000 tokens):</strong><br><br>
+        <div style="font-family: 'Courier New', monospace; line-height: 1.4;" class="is-size-5">
+...<br>
+WaitWait endpoints.<br>
+about Wait.<br>
+, say needWait.<br>
+Maybe Wait Wait set's.<br>
+me Wait„ mark,;.s No.<br>
+the„ me's number minimumButButWait.s the,.<br>
+WaitWaitWait.<br>
+ao over be alone to..<br>
+, Wait.<br>
+. the the the Wait Wait,.s the me's Wait Wait the.s.<br>
+me. with of., range's., to (WaitWait k me nonWaitWait me's total number integer's theBut a asagrams, No me„her.<br>
+Well Wait Wait a.  ...<br>
+        </div>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 1rem; border-left: 4px solid #e74c3c;">
+        <strong class="is-size-5">Issues Identified:</strong>
+        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;" class="is-size-5">
+          <li><strong>Loss of coherence:</strong> The response degenerates into nonsensical and repetitive phrases, losing all logical structure.</li>
+          <li><strong>Repetitive token patterns:</strong> Excessive repetition of words like "Wait" and fragmented sentence structure.</li>
+          <li><strong>Failure to progress:</strong> No meaningful reasoning or solution is present, indicating a collapse due to excessive output length.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</section>
+
+<script>
+  // Function to toggle example visibility
+function toggleExample(exampleId) {
+  const content = document.getElementById(exampleId);
+  const toggle = document.getElementById(exampleId + '-toggle');
+  
+  if (content.style.display === 'none' || content.style.display === '') {
+    content.style.display = 'block';
+    toggle.textContent = '▲';
+  } else {  
+    content.style.display = 'none';
+    toggle.textContent = '▼';
+  }
+}
+</script>
+
+
+<!-- Overall Methodology -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Overall Methodology</h2>
+      <div class="content">
+        <!-- some placeholding ipsum -->
+        <p class="is-size-5">In this work, we aim to guide the reasoning model to think for the right amount of time, which requires knowing its <b>optimal reasoning length (OL)</b> — a prompt-dependent quantity. However, calculating OL in practice is challenging due to the absence of precise measures for both problem difficulty and model capability. To address this, we propose a sample-based approximation of OL <b>(Sample Optimal Length, SOL)</b>, yielding a practical length reward. Finally, we integrate this reward design with Group Relative Policy Optimization (GRPO).</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End overall methodology -->
+
+<!-- Optimal Reasoning Length (OL): Formal Definition -->
+<section class="section">
+  <div class="container">
+    <h3 class="title is-4" style="margin-bottom: 1rem;">Optimal Reasoning Length (OL)</h3>
+    <p class="is-size-5"><b>Problem Setup</b> &nbsp; Let \( \mathcal{M}_\theta \) be our policy model (i.e. a base LRM) with parameters \( \theta \), and \( \mathcal{D} \) be the training dataset. Each problem \((x_i, y^*_i) \in \mathcal{D}\) consists of a prompt \(x_i\) and a reference response \(y^*_i\). Given \(x_i\), for each <i>rollout</i> the model generates a response \(y = (y^1, \ldots, y^t)\) autoregressively from \(p_\theta(\cdot | x_i)\), where \(y^k\) denotes its k-th token and \(\ell(y) = t\) is its length. For reasoning tasks, \(y\) typically includes long CoT tokens (often enclosed in <code>&lt;/think&gt;</code> tags) followed by a final answer.</p>
+    
+    <p class="is-size-5" style="margin-top: 1rem;">We then define a verifier \(\mathcal{I}\) that assigns a normalized <b>correctness score</b> \(s_\mathcal{I}(y, y^*_i) \in [0, 1]\). For fixed correctness threshold \(c \geq 0\) and probability threshold \(\epsilon \geq 0\), the optimal reasoning length is defined as:</p>
+    
+    <div class="is-size-5" style="margin: 1.5em 0; text-align: center;">
+      \[
+        \ell^*_{c,\epsilon}(x_i; \theta) := \min\{\ell(y) : y \in \mathcal{Y}_{c,\epsilon}(x_i; \theta)\}, \quad \text{where}
+      \]
+      \[
+        \mathcal{Y}_{c,\epsilon}(x_i; \theta) := \{y : p_\theta(y \mid x_i) \geq \epsilon \wedge s_\mathcal{I}(y, y^*_i) \geq c\}.
+      \]
+    </div>
+        
+    <p class="is-size-5" style="margin-top: 1rem;"><b>Remark</b> &nbsp; In our method, we narrow our focus to tasks with <b>verifiable answers</b>, such as mathematical and coding problems. These tasks naturally come with a binary verifier that outputs</p>
+    
+    <div class="is-size-5" style="margin: 1.5em 0; text-align: center;">
+      \[
+        \mathbb{I}(y = y^*_i) := s_\mathcal{I}(y, y^*_i) \in \{0, 1\},
+      \]
+    </div>
+    
+    <p class="is-size-5">and we adopt the trivial threshold choice \(c = 1\) and use the shorthand notation \(\mathbb{I}(y = y^*_i)\) to denote correctness.</p>
+  </div>
+</section>
+
+
+<!-- Sample Optimal Reasoning Length (SOL) -->
+<section class="section">
+  <div class="container">
+    <h3 class="title is-4" style="margin-bottom: 1rem;">Our method: Sample Optimal Reasoning Length (SOL)</h3>
+    <p class="is-size-5">we introduce the <b>Sample Optimal Length (SOL)</b> — a practical, sample-based approximation of OL. Given a prompt \(x_i\), our method generates \(n\) rollouts of candidate responses \(G(x_i) = \{ y_1, y_2, \dots, y_n \}\) from the policy \(p_\theta(\cdot|x_i)\). We then define the SOL for the group \(G(x_i)\) as:
+      $$
+      \ell^{SOL}(G(x_i)) =
+      \begin{cases}
+      \quad \displaystyle \min_{y_j \in G(x_i):\,\mathbb{I}(y_j = y_i^*)=1} \ell(y_j), &\text{if at least one response is correct},\\[15pt]
+       \quad \quad\frac{1}{n}\sum_{j=1}^{n}\ell(y_j), &\text{otherwise}.
+      \end{cases}
+      $$
+      Given the SOL, we define the following reward function for each response \(y_j \in G(x_i)\):
+      \begin{equation}\label{eq:sol-reward}
+      r(y_j) = \alpha \cdot \mathbb{I}(y_j = y_i^*) - \beta \cdot \left|\ell(y_j) - \ell^{SOL}(G(x_i))\right|,
+      \end{equation}
+      where \(\alpha, \beta > 0\) are hyperparameters balancing correctness reward and length penalty, respectively.</p>
+  </div>
+</section>
+
+
+<!-- Experiment Results Section -->
+<section class="hero is-small category-section">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Experiment Results</h2>
+      <div class="content is-size-5">
+        We compare the performance of our trained models against the baselines across a range of in-domain math tasks as well as out-of-domain benchmarks. We then provide an in-depth analysis of how our method changed the structure of the reasoning traces.
+        <br><br>
+        <b>Baselines</b> To assess the efficiency of our method, we compare our trained models against 4 baselines:
+        <ul>
+          <li><b>DeepSeek-R1-Distill-Qwen-1.5B/7B (DeepSeek-AI, 2025):</b> Models obtained by distillation from the Qwen series using larger DeepSeek-R1 models. We refer to these models as Distill-1.5B and Distill-7B in the following sections.</li>
+          <li><b>Qwen2.5-1.5B/7B-Instruct (Team, 2024):</b> Instruction-tuned models from the Qwen 2.5 family of large language models. We include these non-reasoning models as a contrast, i.e., fast thinking without deliberate reasoning. We denote them as Instruct-1.5B and Instruct-7B hereafter.</li>
+          <li><b>Training Efficient (Arora and Zanette, 2025):</b> We evaluated the 1.5B/7B open-source models released in this work, which have the same base models as ours.</li>
+          <li><b>O1-Pruner (Luo et al., 2025a):</b> We evaluate the 7B open-source model proposed in this work, which is fine-tuned from the Marco-o1 base model (Zhao et al., 2024).</li>
+        </ul>
+      </div>
+      <div id="plots-container">
+        <div class="plot-div">
+          <div id="plot-aime" style="height:400px;"></div>
+        </div>
+        <div class="plot-div">
+          <div id="plot-olympiad" style="height:400px;"></div>
+        </div>
+        <div class="plot-div">
+          <div id="plot-amc" style="height:400px;"></div>
+        </div>
+        <div class="plot-div">
+          <div id="plot-minerva" style="height:400px;"></div>
+        </div>
+        <div class="plot-div">
+          <div id="plot-mathqa" style="height:400px;"></div>
+        </div>
+        <div class="plot-div">
+          <div id="plot-bbh" style="height:400px;"></div>
+        </div>
+        <div class="plot-div">
+          <div id="plot-mmlu" style="height:400px;"></div>
+        </div>
+        <div class="plot-div">
+          <div id="plot-livecodebench" style="height:400px;"></div>
+        </div>
+      </div>
+      <div id="global-legend" style="height:100px;"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+.category-section {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.hero-body {
+  padding: 3rem 1.5rem;
+}
+
+.title {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.content {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+#plots-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  #plots-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.plot-div {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plot-div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+#global-legend {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-top: 2rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  makePlot('AIME', 'plot-aime');
+  makePlot('Olympiad', 'plot-olympiad');
+  makePlot('AMC', 'plot-amc');
+  makePlot('Minerva', 'plot-minerva');
+  makePlot('MathQA', 'plot-mathqa');
+  makePlot('BBH', 'plot-bbh');
+  makePlot('MMLU', 'plot-mmlu');
+  makePlot('LiveCodeBench', 'plot-livecodebench');
+  createGlobalLegend();
+});
+</script>
+
+<!-- Output Length after First Appearance of Correct Answer -->
+<section class="hero is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Output Length after First Appearance of Correct Answer</h2>
+      <div class="chart-container">
+        <div class="chart" id="chart">
+          <!-- Benchmarks will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color legend-shorter"></div>
+          <span>ShorterBetter-7B</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color legend-distill"></div>
+          <span>Distill-7B</span>
+        </div>
+      </div>
+
+      <!-- <div class="content" style="margin-top: 2rem;">
+        <p class="is-size-5">
+        For each model, we calculate what percentage of its total output (in tokens) appears after the first time that the correct answer is stated. We observe that the percentages of tokens appearing after the first correct answer decreases by 15%, 20%, 17%, and 19% for AMC, MATH, Olympiad, and Minerva benchmarks, respectively. This suggests that ShorterBetter-7Breaches conclusions more efficiently, using fewer tokens on extra reasoning once it reaches the correct answer.</p>
+      </div> -->
+
+
+      <div class="content" style="margin-top: 2rem;">
+        <div class="summary-text is-size-5">
+          For each model, we calculate what percentage of its total output (in tokens) appears after the first time that the correct answer is stated. We observe that the percentages of tokens appearing after the first correct answer decreases by 15%, 20%, 17%, and 19% for AMC, MATH, Olympiad, and Minerva benchmarks, respectively. This suggests that ShorterBetter-7B reaches conclusions more efficiently, using fewer tokens on extra reasoning once it reaches the correct answer.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- End Output Length after First Appearance of Correct Answer -->
+
+<!-- Benchmark Results -->
+<!-- <section class="hero is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Benchmark Results</h2>
+      <div class="content"> -->
+        <!-- some placeholding ipsum -->
+        <!-- <p class="is-size-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec metus vel ante feugiat placerat. Nullam nec metus vel ante feugiat placerat. Nullam nec metus vel ante feugiat placerat.</p>
+      </div>
+    </div>
+  </div>
+</section> -->
+<!-- End benchmark results -->
+
+<!-- Post-training Analysis -->
+<!-- <section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title">Post-training Analysis</h2>
+
+      <div class="content"> -->
+        <!-- some placeholding ipsum -->
+        <!-- <p class="is-size-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec metus vel ante feugiat placerat. Nullam nec metus vel ante feugiat placerat. Nullam nec metus vel ante feugiat placerat.</p>
+      </div>
+    </div>
+</section> -->
+<!--End post-training analysis -->
+
+<!-- Reasoning Traces Analysis -->
+<section class="hero is-small category-section">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Breakdown of Reasoning Traces</h2>
+      
+      <div class="charts-container">
+        <div class="chart-wrapper">
+          <div class="chart-title">Distill-7B</div>
+          <svg class="pie-chart" id="distill-chart"></svg>
+          <div class="avg-tokens">Avg: 2337 tokens</div>
+        </div>
+        
+        <div class="chart-wrapper">
+          <div class="chart-title">ShorterBetter-7B</div>
+          <svg class="pie-chart" id="shorter-chart"></svg>
+          <div class="avg-tokens">Avg: 804 tokens</div>
+        </div>
+      </div>
+
+      <div id="tooltip" class="tooltip"></div>
+
+      <div class="legend">
+        <div class="legend-item" data-category="pivotal">
+          <div class="legend-color pivotal"></div>
+          <span>Pivotal Reasoning</span>
+        </div>
+        <div class="legend-item" data-category="elaboration">
+          <div class="legend-color elaboration"></div>
+          <span>Productive Elaboration & Calculation</span>
+        </div>
+        <div class="legend-item" data-category="alternatives">
+          <div class="legend-color alternatives"></div>
+          <span>Exploring Alternatives</span>
+        </div>
+        <div class="legend-item" data-category="verification">
+          <div class="legend-color verification"></div>
+          <span>Verification & Self-Correction</span>
+        </div>
+        <div class="legend-item" data-category="nonsubstantive">
+          <div class="legend-color nonsubstantive"></div>
+          <span>Non-Substantive Statement</span>
+        </div>
+      </div>
+
+        <!-- <div class="summary-title">Analysis Summary</div> -->
+        <div class="summary-text is-size-5">
+          This analysis reveals how ShorterBetter-7B achieves more efficient reasoning compared to Distill-7B. Using an LLM-as-a-judge framework, we categorized each sentence in reasoning traces and computed token-level proportions across five functional categories. The results demonstrate significant structural improvements in reasoning efficiency.
+        </div>
+        
+        <div class="key-findings is-size-5">
+          <div class="finding-item">
+            <div class="finding-bullet"></div>
+            <div class="finding-text">
+              <span class="highlight">+15.6% Pivotal Reasoning</span> and <span class="highlight">+6.8% Productive Elaboration</span> indicate a denser concentration of meaningful, solution-oriented reasoning in ShorterBetter-7B.
+            </div>
+          </div>
+          
+          <div class="finding-item">
+            <div class="finding-bullet"></div>
+            <div class="finding-text">
+              <span class="highlight">-4.8% Non-Substantive Statements</span> suggests the model produces fewer filler or redundant tokens, leading to more concise outputs.
+            </div>
+          </div>
+          
+          <div class="finding-item">
+            <div class="finding-bullet"></div>
+            <div class="finding-text">
+              Reductions in <span class="highlight">Verification & Self-Correction (-14.1%)</span> and <span class="highlight">Exploring Alternatives (-3.9%)</span> imply more decisive reasoning with fewer unnecessary detours.
+            </div>
+          </div>
+          
+          <div class="finding-item">
+            <div class="finding-bullet"></div>
+            <div class="finding-text">
+              These structural shifts support the conclusion that ShorterBetter promotes more confident and streamlined reasoning trajectories, potentially addressing the early stopping of promising paths issue.
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Reasoning Traces Analysis -->
+
+
+
+<!--BibTex citation -->
+<section class="section is-light" id="BibTeX">
+    <div class="container">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>@article{yi2025shorterbetter,
+  title={Shorterbetter: Guiding reasoning models to find optimal inference length for efficient reasoning},
+  author={Yi, Jingyang and Wang, Jiazheng and Li, Sida},
+  journal={arXiv preprint arXiv:2504.21370},
+  year={2025}
+}</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+</body>
+</html>

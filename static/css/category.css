@@ -1,0 +1,209 @@
+.category-section {
+    font-size: 18px;
+    padding: 40px 0;
+    background: #fff;
+}
+
+.category-section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.category-section .title {
+    text-align: left;
+    margin-bottom: 40px;
+    color: #2d3748;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.category-section .charts-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 40px 0;
+    gap: 60px;
+}
+
+.category-section .chart-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+}
+
+.category-section .chart-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.category-section .pie-chart {
+    width: 400px;
+    height: 400px;
+    cursor: pointer;
+}
+
+.category-section .avg-tokens {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #4a5568;
+    text-align: center;
+}
+
+.category-section .legend {
+    margin: 40px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.category-section .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #4a5568;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.category-section .legend-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+.category-section .legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.category-section .pivotal { background: #7fb3d3; }
+.category-section .elaboration { background: #f4a261; }
+.category-section .alternatives { background: #90c695; }
+.category-section .verification { background: #f76c6c; }
+.category-section .nonsubstantive { background: #c8a2c8; }
+
+.category-section .tooltip {
+    position: absolute;
+    background: rgba(45, 55, 72, 0.95);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: pre-line;
+}
+
+.category-section .summary-section {
+    background: linear-gradient(135deg, #f7fafc, #edf2f7);
+    border-radius: 15px;
+    padding: 30px;
+    margin: 40px auto;
+    border-left: 5px solid #4ecdc4;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.category-section .summary-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.category-section .summary-text {
+    color: #4a5568;
+    line-height: 1.7;
+    font-size: 18px;
+    margin-bottom: 20px;
+    text-align: left;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.category-section .key-findings {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    margin-top: 30px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.category-section .finding-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+.category-section .finding-item:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.category-section .finding-bullet {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ecdc4;
+    margin-top: 8px;
+    flex-shrink: 0;
+}
+
+.category-section .finding-text {
+    color: #4a5568;
+    line-height: 1.6;
+    font-size: 18px;
+}
+
+.category-section .highlight {
+    background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .category-section .pie-chart {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .category-section .legend {
+        grid-template-columns: 1fr;
+        padding: 0 20px;
+    }
+    
+    .category-section .summary-section {
+        margin: 40px 20px;
+    }
+    
+    .category-section .finding-text {
+        font-size: 16px;
+    }
+}
